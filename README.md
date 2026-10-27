@@ -12,7 +12,7 @@
 | --- | --- |
 | 9 个聊天工具 `bilibili_*` | 同名 9 个工具，语义保持一致 |
 | Dashboard 配置页 | 设置 → **B站拾讯** 独立页面（`settings.section`）：账号扫码、来源增删、采集参数、来源状态、最近内容；工具侧也保留全部管理能力 |
-| 模型生成简报 | `bilibili_generate_briefing` 只返回排序后的证据素材，由当前会话的 Agent 自己写简报（不再额外调用一次模型） |
+| 模型生成简报 | `bilibili_generate_briefing` 返回按来源轮换和发布时间选取的证据素材，附带兴趣说明，由当前会话的 Agent 判断取舍并写简报（不再额外调用一次模型） |
 | `/B站登录` `/B站状态` `/B站退出` | `/bilibili-login` `/bilibili-status` `/bilibili-logout`，另有 `/bilibili-refresh`；二维码可在设置页或 `bilibili_login` 工具中查看 |
 | 私聊 / 多用户隔离 | DSH 是单机单用户，数据按本机档案保存；聊天平台的用户隔离不适用 |
 | QQ 平台图片投递 | 图片同时保存原图文件、并经宿主图片服务在会话中展示；`preview` 只展示宿主图像副本 |
@@ -64,10 +64,10 @@ dsh plugin --profile <profile> add link:<本目录绝对路径>
 | `bilibili_get_source_status` | 来源采集时间、失败原因、扫描范围与保留数量 |
 | `bilibili_refresh_subscriptions` | 发起 / 查询采集任务，有限等待（0–20 秒） |
 | `bilibili_send_content_images` | 下载并展示条目图片，默认保留原图字节 |
-| `bilibili_generate_briefing` | 生成排好序的简报素材，不调用模型 |
+| `bilibili_generate_briefing` | 按来源轮换和发布时间选取简报素材；兴趣交给 Agent 判断，不调用模型 |
 | `bilibili_login` | 扫码登录 / 状态 / 退出 |
 
-设置类工具使用 `version` 做乐观并发；同一参数重复调用返回 `replayed` 结果。保存设置不会自动采集。
+设置类工具使用 `version` 做乐观并发；同一版本、同一修改内容的重试返回 `replayed` 结果。读取新版本后重复相同修改视为新操作，删除后可再次添加。设置先在副本中完整校验，校验失败不修改内存、版本、回执或磁盘。保存设置不会自动采集。
 
 ## 定时采集
 
@@ -129,7 +129,18 @@ client.js       设置页（settings.section，React 来自浏览器模块表）
 
 ```text
 node test/smoke.mjs          # 离线：条目归一化、设置版本/撤销、查询过滤、简报、二维码
+node --test test/regressions.mjs # 重复订阅、事务校验、全来源查询、公平选材、登录竞态
 node test/client-render.mjs  # 无浏览器渲染设置页（React stub），检查文案与分支
 BILIBILI_LIVE=1 node test/smoke.mjs   # 额外做一次真实匿名搜索（1 次请求）
 ```
 
+
+## v0.3.1 修复说明
+
+- 修复重复添加／删除订阅被旧幂等回执拦截；请求编号同时包含 expected_version 和修改内容。
+- 扫码、登录状态检查、二维码生成和卸载使用登录代次检查；退出后迟到的响应不会重新保存凭据。HTTP Cookie 罐也拒绝旧代次响应的 Set-Cookie 与扫码回调凭据；同一轮扫码不重叠轮询，账号文件写入串行化。
+- 只指定来源 kind 时展开全部匹配来源；指定 key 仍严格限制，未知来源不会扩大范围。
+- 设置在副本中全部校验通过后才提交；组合修改报错不再留下半改状态。
+- 简报从全部符合条件的保留内容分来源轮换，跨来源条目只选一次，然后应用最多60条候选／最多10条输出的限制；公开检索每页仍最多10条。兴趣只作为当前 Agent 的取舍依据，插件不执行语义兴趣评分；输出明确标记 interest_ranking_applied=false。
+
+验证：8项原有离线检查、13项新增回归及1项React桩页面渲染检查通过。未使用真实DSH、真实扫码账号、付费模型或真实B站网络；不能据此宣称宿主安装及真实登录已验收。

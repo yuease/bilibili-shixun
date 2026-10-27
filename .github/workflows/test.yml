@@ -16,5 +16,7 @@ jobs:
           node-version: 22
       - name: Offline checks (items, settings, retrieval, schedule, QR)
         run: node test/smoke.mjs
+      - name: Regression checks (settings, source scope, briefing, login races)
+        run: node --test test/regressions.mjs
       - name: Settings page render check (React stub)
         run: node test/client-render.mjs
