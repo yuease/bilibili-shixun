@@ -1,0 +1,8 @@
+node_modules/
+test/.tmp-*
+*.log
+.DS_Store
+Thumbs.db
+state.json
+account.json
+media/

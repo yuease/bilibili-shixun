@@ -1,0 +1,44 @@
+{
+  "name": "dsh-bilibili-shixun",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "B站拾讯 for DeepSeek Harness: anonymous Bilibili video search, keyword/UP/following subscriptions, local library, source refresh, personal briefings and a settings page.",
+  "keywords": ["dsh", "dsh-plugin", "bilibili", "search", "subscription"],
+  "license": "MIT",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "node test/smoke.mjs && node test/client-render.mjs"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "lib",
+    "client.js",
+    "locale/*.json",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "test/smoke.mjs",
+    "test/client-render.mjs"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  }
+}

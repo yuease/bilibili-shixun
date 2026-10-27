@@ -1,0 +1,10 @@
+# B站拾讯 (dsh-bilibili-shixun) bundle patch.
+# One Host plugin row; runtime data lives in $DSH_HOME/bilibili-shixun.
+- insert:
+    - id: bilibili-shixun
+      name: dsh-bilibili-shixun
+      config:
+        dataDir: !!js dshHomePath('bilibili-shixun')
+        requestTimeoutMs: 20000
+        requestIntervalMs: 1000
+        maxItems: 3000
