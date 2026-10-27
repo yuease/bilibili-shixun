@@ -1,5 +1,7 @@
 # B站拾讯 · dsh-bilibili-shixun
 
+[![test](https://github.com/yuease/bilibili-shixun/actions/workflows/test.yml/badge.svg)](https://github.com/yuease/bilibili-shixun/actions/workflows/test.yml)
+
 把 [astrbot_plugin_bilibili_shixun](https://github.com/yuease/astrbot_plugin_bilibili_shixun)（B站拾讯 v0.9.1）复刻到 DeepSeek Harness 的 Host 插件：直连 B 站，提供免登录关键词视频搜索、关键词 / UP 主 / 我的关注订阅、来源采集、本地内容库查询、条目图片查看与个人简报素材。
 
 不依赖 RSSHub、不需要额外服务；除宿主内置能力外没有运行时依赖。
